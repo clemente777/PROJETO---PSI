@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{url_for('static', filename='base.css')}}">
+    <title>{% block title %}{% endblock %}</title>
+
+    {% block head %}{% endblock %}
+
+</head>
+<body>
+
+    <header>
+        <h1>Inicio do projeto</h1>
+        <ul>
+            <li>
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil nemo neque ipsa veniam,
+                 molestiae sed doloremque, nostrum odio suscipit consequatur fugit saepe, rerum consectetur sit ipsam nam! Magni, laboriosam voluptas.
+            </li>
+        </ul>
+    </header>
+
+
+    <main>
+        {% block content %}
+
+        {% endblock %}
+    </main>
+</body>
+</html>
