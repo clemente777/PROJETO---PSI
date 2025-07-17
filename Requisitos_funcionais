@@ -1,0 +1,13 @@
+## Requisitos Funcionais
+
+- RF01: O sistema deve permitir login de usuários.
+- RF02: O sistema deve permitir cadastro de tutores.
+- RF03: O sistema deve permitir cadastro de pets.
+- RF04: O sistema deve permitir agendamento de consultas.
+- RF05: O sistema deve permitir registro de atendimentos.
+- RF06: O sistema deve listar tutores, pets e agendamentos.
+- RF07: O sistema deve permitir editar e excluir cadastros.
+- RF08: O sistema deve gerar relatórios simples.
+- RF09: O sistema deve usar rotas Flask com `GET` e `POST`, incluindo `request`, `redirect`, `make_response` e `url_for`.
+- RF10: O sistema deve utilizar banco de dados SQLite.
+- RF11: O sistema deve usar templates HTML com Jinja2 (`extends` e `includes`).
