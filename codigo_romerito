@@ -1,0 +1,116 @@
+from flask import Flask, render_template
+from flask import url_for, request, flash
+
+from flask_login import LoginManager, login_required
+from flask_login import login_user, logout_user
+from flask import session, redirect
+
+from modelos import User
+
+import sqlite3
+from database import obter_conexao
+
+login_manager = LoginManager() 
+app = Flask(__name__)
+app.secret_key = 'guilherme'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+@app.route('/')
+def index():
+
+    if 'usuarios' not in session:
+        usuarios = {}
+        session['usuarios'] = usuarios
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == "POST":
+        # pegar os dados do usuário
+        email = request.form['email']
+        senha= request.form['senha']
+
+        conexao = obter_conexao()
+        sql = "SELECT * FROM users WHERE email = ?"
+        resultado = conexao.execute(sql, (email,) ).fetchone()
+
+        if email in resultado and senha == resultado['senha']:
+            user = User(nome=email,senha=senha)
+            user.id = email
+            
+            login_user(user)
+            conexao.commit()
+            conexao.close()
+
+            return redirect(url_for('dash'))
+        conexao.close()
+        
+        flash('Houve errro: senha ou login inválidos.', category='error')
+        return redirect(url_for('login'))
+
+    return render_template('login.html')
+
+@app.route('/register', methods=['POST','GET'])
+def register():
+    
+    if request.method == "POST":
+        email = request.form['email']
+        senha= request.form['senha']
+       
+        # fazer conexao ???
+        # conexao = sqlite3.connect('banco.db')
+        # conexao.row_factory = sqlite3.Row
+        conexao = obter_conexao()
+        sql = "SELECT * FROM users WHERE email = ?"
+        resultado = conexao.execute(sql, (email,) ).fetchone()
+        
+        if not resultado:
+            sql = "INSERT INTO users(email, senha) VALUES(?,?)"
+            conexao.execute(sql, (email, senha))
+            conexao.commit()
+            conexao.close()
+
+            # login do usuário
+            user = User(nome=email,senha=senha)
+            user.id = email
+            
+            login_user(user)
+
+            # queridos alunos e alunas, corrigam a categoria
+            # quando vocês pegarem o código
+            flash('Cadastro realizado com sucesso', category='error')
+            return redirect(url_for('dash'))
+            
+        conexao.close()
+
+        flash('Erro ao realizar cadastro', category='error')
+        return redirect(url_for('register'))
+
+    return render_template('register.html')
+
+@app.route('/dash')
+@login_required
+def dash():
+    return render_template('dashboard.html',
+        lista_usuarios=User.all())
+
+
+@app.route('/logout', methods=['POST'])
+@login_required
+def logout():
+
+    logout_user()
+
+    return redirect(url_for('index'))
+
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    nome = request.form['user']
+    User.delete(nome)
+    return redirect(url_for('dash'))
